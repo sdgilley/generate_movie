@@ -1,0 +1,30 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.class
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# Environment Variables
+.env
+
+# Generated Content
+*.mp4
+*.avi
+*.mov
+*.wmv
+audio_clips/
+exported_slides/
+slide_images/
+test_audio/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

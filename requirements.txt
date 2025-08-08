@@ -1,0 +1,20 @@
+# PowerPoint to Video Converter Requirements
+# Core video processing
+moviepy>=2.0.0
+
+# PowerPoint processing
+python-pptx>=0.6.21
+
+# Image processing
+Pillow>=9.0.0
+
+# Azure Speech Services
+azure-cognitiveservices-speech>=1.24.0
+
+# Environment variables
+python-dotenv>=0.19.0
+
+# Additional dependencies (installed automatically with above)
+# - numpy (required by moviepy)
+# - imageio (required by moviepy)
+# - decorator (required by moviepy)
