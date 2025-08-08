@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="320" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .box { fill: #f0f9ff; stroke: #0369a1; stroke-width: 2; rx: 8; }
+      .text { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; }
+      .title { font-weight: bold; fill: #1e40af; }
+      .subtitle { font-size: 12px; fill: #64748b; }
+      .arrow { stroke: #059669; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#059669" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text class="text" style="font-size: 18px; font-weight: bold; fill: #1e40af;" x="300" y="20">PowerPoint to Video Conversion</text>
+  
+  <!-- PowerPoint Input -->
+  <rect class="box" x="20" y="60" width="120" height="80"/>
+  <text class="text title" x="80" y="85">📊 PowerPoint</text>
+  <text class="text subtitle" x="80" y="105">(.pptx)</text>
+  <text class="text subtitle" x="80" y="125">Slides + Notes</text>
+  
+  <!-- Arrow 1 -->
+  <path class="arrow" d="M 150 100 L 180 100"/>
+  
+  <!-- Processing Steps -->
+  <rect class="box" x="190" y="40" width="140" height="120"/>
+  <text class="text title" x="260" y="65">🔄 Processing</text>
+  <text class="text subtitle" x="260" y="90">1. Extract slides</text>
+  <text class="text subtitle" x="260" y="110">2. Extract notes</text>
+  <text class="text subtitle" x="260" y="130">3. Generate AI audio</text>
+  <text class="text subtitle" x="260" y="150">4. Combine media</text>
+  
+  <!-- Arrow 2 -->
+  <path class="arrow" d="M 340 100 L 370 100"/>
+  
+  <!-- Video Output -->
+  <rect class="box" x="380" y="60" width="120" height="80"/>
+  <text class="text title" x="440" y="85">🎬 Video</text>
+  <text class="text subtitle" x="440" y="105">(.mp4)</text>
+  <text class="text subtitle" x="440" y="125">With AI narration</text>
+  
+  <!-- Azure Speech Services -->
+  <rect class="box" x="190" y="210" width="140" height="60"/>
+  <text class="text title" x="260" y="235">☁️ Azure Speech</text>
+  <text class="text subtitle" x="260" y="255">AI Voice Generation</text>
+  
+  <!-- Arrow from Azure to Processing -->
+  <path class="arrow" d="M 260 200 L 260 170"/>
+</svg>

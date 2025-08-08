@@ -2,10 +2,13 @@
 
 Automatically convert PowerPoint presentations into professional videos with high-quality AI narration using Azure Speech Services.
 
+![Process Diagram](process-diagram.svg)
+
+
 ##  Features
 
 - **Extract narration from PowerPoint slide notes** - No need for separate narration files
-- **High-quality Azure Speech Services** - Natural-sounding AI voice (en-US-AvaMultilingualNeural)
+- **High-quality Azure Speech Services** - Natural-sounding AI voice 
 - **Smart pause timing** - Pause before narration for better slide readability
 - **Automatic processing** - Handles slide export, audio generation, and video compilation
 - **Configurable settings** - Customize pause duration, narration source, and output settings
@@ -47,15 +50,14 @@ Automatically convert PowerPoint presentations into professional videos with hig
    python generate_with_azure_audio.py
    `
 
-##  Project Structure
+## Project Structure
 
 - generate_with_azure_audio.py - Main script for video generation
 - generate_from_slides.py - Export slides from PowerPoint
-- 
-equirements.txt - Python dependencies
+- requirements.txt - Python dependencies
 - content_maintenance_process.pptx - Example PowerPoint file
 
-##  Configuration
+## Configuration
 
 Edit the .env file to customize:
 
@@ -76,11 +78,11 @@ OUTPUT_VIDEO=your_presentation_WITH_AZURE_AUDIO.mp4
 ##  How It Works
 
 1. **Slide Export** - Extracts slides from PowerPoint as high-resolution images
-2. **Narration Extraction** - Reads narration text from slide notes
-3. **Audio Generation** - Creates natural speech using Azure Speech Services
-4. **Video Assembly** - Combines slides with audio using optimal timing:
+1. **Narration Extraction** - Reads narration text from slide notes
+1. **Audio Generation** - Creates natural speech using Azure Speech Services
+1. **Video Assembly** - Combines slides with audio using optimal timing:
    - Slide appears immediately
-   - 1.5-second reading pause
+   - reading pause at beginning of each slide (configure in .env file, default 1.5 sec)
    - Narration plays while slide remains visible
    - Smooth transition to next slide
 
