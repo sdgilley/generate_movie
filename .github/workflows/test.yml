@@ -1,0 +1,39 @@
+name: Test Environment Setup
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-setup:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Test filename utilities
+      run: |
+        python utilities/filename_utils.py
+    
+    - name: Test import statements
+      run: |
+        python -c "from utilities.filename_utils import generate_output_filename; print('✅ Imports working')"
+        python -c "import utilities.generate_from_slides; print('✅ Slide export module loads')"
+    
+    - name: Validate configuration files
+      run: |
+        if [ -f .env.example ]; then echo "✅ .env.example exists"; else echo "❌ .env.example missing"; exit 1; fi
+        if [ -f .devcontainer/devcontainer.json ]; then echo "✅ devcontainer.json exists"; else echo "❌ devcontainer.json missing"; exit 1; fi
+        if [ -f .vscode/tasks.json ]; then echo "✅ tasks.json exists"; else echo "❌ tasks.json missing"; exit 1; fi
