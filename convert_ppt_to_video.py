@@ -126,8 +126,8 @@ def main():
     # Step 1: Export slides from PowerPoint
     print_step(1, "Exporting slides from PowerPoint as images")
     try:
-        success = export_slides()
-        if not success:
+        intermediate_video = export_slides()
+        if not intermediate_video:
             print("❌ Failed to export slides.")
             return False
         print("✅ Slides exported successfully!")
@@ -163,6 +163,17 @@ def main():
     if not check_output_files():
         print("⚠️  Some expected output files were not found.")
     
+    # Clean up intermediate files
+    print("\n🧹 Cleaning up intermediate files...")
+    try:
+        if intermediate_video and os.path.exists(intermediate_video):
+            os.remove(intermediate_video)
+            print(f"Removed: {intermediate_video}")
+        else:
+            print("No intermediate video file to clean up")
+    except Exception as e:
+        print(f"Warning: Could not remove intermediate video file: {e}")
+    
     # Calculate total time
     end_time = time.time()
     total_time = end_time - start_time
@@ -182,6 +193,9 @@ def main():
     print("\n🧹 Cleaned up:")
     print("  • slide_images/ - Temporary processed slide images")
     print("  • test_audio/ - Temporary audio test files")
+    if intermediate_video:
+        intermediate_name = os.path.basename(intermediate_video)
+        print(f"  • {intermediate_name} - Intermediate slides-only video")
     
     print("\n🎉 Success! Your PowerPoint presentation has been converted to video with narration.")
     return True

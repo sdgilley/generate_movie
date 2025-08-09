@@ -7,32 +7,178 @@ from PIL import Image
 import tempfile
 from dotenv import load_dotenv
 
+# Import utility functions
+try:
+    from .filename_utils import get_powerpoint_file, generate_output_filename
+except ImportError:
+    from filename_utils import get_powerpoint_file, generate_output_filename
+
 # Load environment variables
 load_dotenv()
 
 def export_slides_as_images_libreoffice(pptx_file, output_dir="exported_slides"):
-    """Try to export slides using LibreOffice (if available)"""
+    """Try to export slides using LibreOffice + ImageMagick with better visual fidelity"""
     os.makedirs(output_dir, exist_ok=True)
     
     try:
-        # Try LibreOffice command
-        cmd = [
-            "soffice", "--headless", "--convert-to", "png", 
-            "--outdir", output_dir, pptx_file
-        ]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        # First, try to convert PowerPoint to PDF using LibreOffice with better settings
+        print("Converting PowerPoint to PDF using LibreOffice (with enhanced settings)...")
         
-        if result.returncode == 0:
-            print("Successfully exported slides using LibreOffice")
+        # Use more advanced LibreOffice export settings for better visual fidelity
+        cmd_pdf = [
+            "soffice", "--headless", "--invisible", "--convert-to", "pdf",
+            "--outdir", ".",
+            "--writer",  # Force through writer for better conversion
+            pptx_file
+        ]
+        result_pdf = subprocess.run(cmd_pdf, capture_output=True, text=True, timeout=90)
+        
+        if result_pdf.returncode != 0:
+            print(f"LibreOffice enhanced PDF conversion failed: {result_pdf.stderr}")
+            # Try simpler conversion as fallback
+            cmd_pdf_simple = [
+                "soffice", "--headless", "--convert-to", "pdf",
+                "--outdir", ".", pptx_file
+            ]
+            result_pdf = subprocess.run(cmd_pdf_simple, capture_output=True, text=True, timeout=60)
+            
+            if result_pdf.returncode != 0:
+                print(f"LibreOffice simple PDF conversion also failed: {result_pdf.stderr}")
+                return False
+        
+        # Check if PDF was created
+        pdf_path = os.path.splitext(pptx_file)[0] + ".pdf"
+        if not os.path.exists(pdf_path):
+            print("PDF file was not created successfully")
+            return False
+        
+        print(f"PDF created successfully: {pdf_path}")
+        
+        # Use ImageMagick with enhanced settings for better slide image quality
+        print("Converting PDF pages to individual slide images using ImageMagick (high quality)...")
+        cmd_convert = [
+            "convert", 
+            "-density", "300",      # Higher resolution for better quality
+            "-quality", "95",       # Higher quality setting
+            "-background", "white", # Ensure white background
+            "-alpha", "remove",     # Remove transparency issues
+            "-colorspace", "RGB",   # Ensure RGB colorspace
+            pdf_path,
+            os.path.join(output_dir, "slide_%d.png")
+        ]
+        
+        result_convert = subprocess.run(cmd_convert, capture_output=True, text=True, timeout=180)
+        
+        # Clean up the temporary PDF
+        if os.path.exists(pdf_path):
+            os.remove(pdf_path)
+            print(f"Cleaned up temporary PDF: {pdf_path}")
+        
+        if result_convert.returncode == 0:
+            # Check how many slide images were created
+            slide_files = [f for f in os.listdir(output_dir) if f.startswith('slide_') and f.endswith('.png')]
+            print(f"Successfully exported {len(slide_files)} slides using LibreOffice + ImageMagick (enhanced)")
             return True
         else:
-            print(f"LibreOffice export failed: {result.stderr}")
+            print(f"ImageMagick conversion failed: {result_convert.stderr}")
             return False
+            
     except Exception as e:
-        print(f"LibreOffice not available or failed: {e}")
+        print(f"LibreOffice + ImageMagick enhanced export failed: {e}")
+        # Clean up PDF if it exists
+        pdf_path = os.path.splitext(pptx_file)[0] + ".pdf"
+        if os.path.exists(pdf_path):
+            os.remove(pdf_path)
+        return False
+
+def export_slides_as_images_macos_keynote(pptx_file, output_dir="exported_slides"):
+    """Try to export slides using macOS Keynote (if available)"""
+    os.makedirs(output_dir, exist_ok=True)
+    
+    try:
+        # Create AppleScript to open PowerPoint in Keynote and export as images
+        applescript = f'''
+        tell application "Keynote"
+            activate
+            open POSIX file "{os.path.abspath(pptx_file)}"
+            delay 3
+            tell front document
+                set slide_count to count of slides
+                repeat with i from 1 to slide_count
+                    set slide_path to "{os.path.abspath(output_dir)}/slide_" & i & ".png"
+                    export slide i as "slide images" to file slide_path
+                end repeat
+            end tell
+            close front document
+            quit
+        end tell
+        '''
+        
+        print("Trying to export slides using macOS Keynote...")
+        result = subprocess.run(
+            ["osascript", "-e", applescript],
+            capture_output=True, text=True, timeout=120
+        )
+        
+        if result.returncode == 0:
+            slide_files = [f for f in os.listdir(output_dir) if f.startswith('slide_') and f.endswith('.png')]
+            if len(slide_files) > 0:
+                print(f"Successfully exported {len(slide_files)} slides using macOS Keynote")
+                return True
+            else:
+                print("Keynote export completed but no slide files found")
+                return False
+        else:
+            print(f"Keynote export failed: {result.stderr}")
+            return False
+            
+    except Exception as e:
+        print(f"macOS Keynote export failed: {e}")
         return False
 
 def export_slides_as_images_powershell(pptx_file, output_dir="exported_slides"):
+    """Try to export slides using PowerShell (Windows only)"""
+    os.makedirs(output_dir, exist_ok=True)
+    
+    try:
+        # PowerShell script to export PowerPoint slides
+        ps_script = f'''
+        $ppt = New-Object -ComObject PowerPoint.Application
+        $ppt.Visible = [Microsoft.Office.Core.MsoTriState]::msoFalse
+        $presentation = $ppt.Presentations.Open("{os.path.abspath(pptx_file)}")
+        
+        for ($i = 1; $i -le $presentation.Slides.Count; $i++) {{
+            $slide = $presentation.Slides.Item($i)
+            $slide.Export("{os.path.abspath(output_dir)}\\slide_$i.png", "PNG")
+        }}
+        
+        $presentation.Close()
+        $ppt.Quit()
+        [System.Runtime.Interopservices.Marshal]::ReleaseComObject($ppt)
+        '''
+        
+        # Save PowerShell script to temp file
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.ps1', delete=False) as f:
+            f.write(ps_script)
+            ps_file = f.name
+        
+        # Execute PowerShell script
+        cmd = ["powershell.exe", "-ExecutionPolicy", "Bypass", "-File", ps_file]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        
+        # Clean up temp file
+        os.unlink(ps_file)
+        
+        if result.returncode == 0:
+            print("Successfully exported slides using PowerShell")
+            return True
+        else:
+            print(f"PowerShell export failed: {result.stderr}")
+            return False
+            
+    except Exception as e:
+        print(f"PowerShell export failed: {e}")
+        return False
     """Try to export slides using PowerShell (Windows only)"""
     os.makedirs(output_dir, exist_ok=True)
     
@@ -96,17 +242,25 @@ def export_slides_python_fallback(pptx_file, output_dir="exported_slides"):
                     text = shape.text.strip()
                     
                     # Try to identify title (usually first or short text)
-                    if hasattr(shape, "placeholder_format"):
-                        if shape.placeholder_format.type == 1:  # Title placeholder
-                            content['title'] = text
-                        elif shape.placeholder_format.type == 2:  # Content placeholder
-                            # Split by lines and treat as bullet points
-                            lines = [line.strip() for line in text.split('\n') if line.strip()]
-                            content['bullet_points'].extend(lines)
+                    try:
+                        if hasattr(shape, "placeholder_format") and shape.placeholder_format:
+                            if shape.placeholder_format.type == 1:  # Title placeholder
+                                content['title'] = text
+                            elif shape.placeholder_format.type == 2:  # Content placeholder
+                                # Split by lines and treat as bullet points
+                                lines = [line.strip() for line in text.split('\n') if line.strip()]
+                                content['bullet_points'].extend(lines)
+                            else:
+                                content['other_text'].append(text)
                         else:
-                            content['other_text'].append(text)
-                    else:
-                        # No placeholder info, make educated guess
+                            # No placeholder info, make educated guess
+                            if not content['title'] and len(text) < 100:
+                                content['title'] = text
+                            else:
+                                content['other_text'].append(text)
+                    except Exception as e:
+                        # If placeholder access fails, treat as other text
+                        print(f"Warning: Could not access placeholder format for shape: {e}")
                         if not content['title'] and len(text) < 100:
                             content['title'] = text
                         else:
@@ -220,15 +374,28 @@ def export_slides_python_fallback(pptx_file, output_dir="exported_slides"):
             slide_num = i + 1
             print(f"Creating slide image {slide_num}...")
             
-            # Extract content
-            content = extract_slide_content(slide)
-            
-            # Create image
-            img = create_slide_image(content, slide_num)
-            
-            # Save image
-            output_path = os.path.join(output_dir, f"slide_{slide_num}.png")
-            img.save(output_path)
+            try:
+                # Extract content
+                content = extract_slide_content(slide)
+                
+                # Create image
+                img = create_slide_image(content, slide_num)
+                
+                # Save image
+                output_path = os.path.join(output_dir, f"slide_{slide_num}.png")
+                img.save(output_path)
+            except Exception as e:
+                print(f"Warning: Failed to process slide {slide_num}: {e}")
+                # Create a simple error slide
+                try:
+                    error_img = Image.new('RGB', (1280, 720), color='white')
+                    error_draw = ImageDraw.Draw(error_img)
+                    error_draw.text((50, 300), f"Slide {slide_num} - Processing Error", fill='red')
+                    output_path = os.path.join(output_dir, f"slide_{slide_num}.png")
+                    error_img.save(output_path)
+                except:
+                    print(f"Could not create error slide for slide {slide_num}")
+                    continue
         
         print(f"Successfully exported {len(presentation.slides)} slides to {output_dir}/")
         return True
@@ -344,9 +511,14 @@ def main():
 
     success = False
 
-    # Try PowerShell method first (best for Windows)
-    print("Trying PowerShell export...")
-    success = export_slides_as_images_powershell(pptx_file)
+    # Try macOS Keynote method first (best visual fidelity on macOS)
+    print("Trying macOS Keynote export...")
+    success = export_slides_as_images_macos_keynote(pptx_file)
+
+    # Try PowerShell method (best for Windows)
+    if not success:
+        print("Trying PowerShell export...")
+        success = export_slides_as_images_powershell(pptx_file)
 
     # If PowerShell failed, try LibreOffice
     if not success:
@@ -416,7 +588,9 @@ def main():
         final_video = concatenate_videoclips(video_clips, method="compose")
         print("Video clips concatenated successfully")
 
-        output_filename = "code_maintenance_process_SLIDES.mp4"
+        # Generate output filename based on PowerPoint file (for intermediate slides-only video)
+        pptx_file = get_powerpoint_file()
+        output_filename = generate_output_filename(pptx_file, "_SLIDES")
         print(f"Writing final video file: {output_filename}")
         final_video.write_videofile(output_filename, fps=24)
         print("Final video file written successfully!")
@@ -429,10 +603,12 @@ def main():
         
         print(f"\nVideo created successfully: {output_filename}")
         print(f"Duration: {len(video_clips) * 4} seconds ({len(video_clips)} slides x 4 seconds each)")
-        return True
+        
+        # Return the filename so it can be cleaned up later if needed
+        return output_filename
     else:
         print("No video clips were created!")
-        return False
+        return None
 
 if __name__ == "__main__":
     main()

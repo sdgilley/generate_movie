@@ -38,8 +38,22 @@ Automatically convert PowerPoint presentations into professional videos with hig
    ```
 
 1. **Install dependencies:**
+
    ```bash
    pip install -r requirements.txt
+   ```
+
+1. **Install additional system dependencies (macOS only):**
+
+   ```bash
+   # Install LibreOffice for PowerPoint conversion
+   brew install --cask libreoffice
+   
+   # Install ImageMagick for image processing
+   brew install imagemagick
+   
+   # Install Ghostscript (required for ImageMagick PDF processing)
+   brew install ghostscript
    ```
 
 1. **Set up Azure Speech Services:**
