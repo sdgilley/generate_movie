@@ -34,6 +34,7 @@ from dotenv import load_dotenv
 from utilities.generate_from_slides import main as export_slides
 from utilities.generate_audio import test_audio_generation
 from utilities.generate_with_azure_audio import main as generate_video_with_audio
+from utilities.filename_utils import get_powerpoint_file, get_output_video_name
 
 # Load environment variables
 load_dotenv()
@@ -63,7 +64,7 @@ def check_prerequisites():
     print(f"✅ Found environment file: {env_file}")
 
     # Check for PowerPoint file
-    pptx_file = os.environ.get('POWERPOINT_FILE', 'content_maintenance_process.pptx')
+    pptx_file = get_powerpoint_file()
     if not os.path.exists(pptx_file):
         print(f"❌ ERROR: PowerPoint file not found: {pptx_file}")
         print("Please ensure your PowerPoint file is in the current directory.")
@@ -85,8 +86,8 @@ def check_output_files():
     """Check if expected output files were created"""
     print_step(4, "Checking output files")
     
-    # Get filenames from environment variables
-    output_video = os.environ.get('OUTPUT_VIDEO_NAME', 'code_maintenance_process_WITH_AZURE_AUDIO.mp4')
+    # Get filenames from utility functions
+    output_video = get_output_video_name()
     
     expected_files = [
         output_video,
@@ -166,8 +167,8 @@ def main():
     end_time = time.time()
     total_time = end_time - start_time
     
-    # Get output video name from environment
-    output_video = os.environ.get('OUTPUT_VIDEO_NAME', 'code_maintenance_process_WITH_AZURE_AUDIO.mp4')
+    # Get output video name from utility function
+    output_video = get_output_video_name()
     
     print_header("Process Complete!")
     print(f"✅ Total processing time: {total_time:.1f} seconds ({total_time/60:.1f} minutes)")

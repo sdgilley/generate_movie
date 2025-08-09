@@ -57,16 +57,15 @@ Edit the .env file to customize:
 
 ```env
 # PowerPoint file to process
-POWERPOINT_FILE=content_maintenance_process.pptx
+POWERPOINT_FILE=your_presentation.pptx
+
+# Note: Output video filename is automatically generated
 
 # Narration source: 'slide_notes' or 'external_file'
 NARRATION_SOURCE=slide_notes
 
 # Pause duration before narration (seconds)
 PAUSE_DURATION=1.5
-
-# Output video filename
-OUTPUT_VIDEO=your_presentation_WITH_AZURE_AUDIO.mp4
 ```
 
 ##  How It Works

@@ -11,15 +11,17 @@ from dotenv import load_dotenv
 # Import generate_audio_file with fallback for relative import
 try:
     from .generate_audio import generate_audio_file
+    from .filename_utils import get_powerpoint_file, get_output_video_name
 except ImportError:
     from generate_audio import generate_audio_file
+    from filename_utils import get_powerpoint_file, get_output_video_name
 
 # Load environment variables
 load_dotenv()
 
 # Configuration from environment variables
-pptx_file = os.environ.get('POWERPOINT_FILE', 'content_maintenance_process.pptx')
-output_video_name = os.environ.get('OUTPUT_VIDEO_NAME', 'code_maintenance_process_WITH_AZURE_AUDIO.mp4')
+pptx_file = get_powerpoint_file()
+output_video_name = get_output_video_name()
 pause_duration = float(os.environ.get('PAUSE_DURATION', '1.5'))
 include_end_slide = os.environ.get('INCLUDE_END_SLIDE', 'true').lower() in ('true', 'yes', '1')
 
