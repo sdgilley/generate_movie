@@ -2,17 +2,8 @@
 
 Automatically convert PowerPoint presentations into professional videos with high-quality AI narration using Azure Speech Services.
 
-![Process Diagram](process-diagram.svg)
+![Process Diagram](./media/diagram.png)
 
-
-##  Features
-
-- **Extract narration from PowerPoint slide notes** - No need for separate narration files
-- **High-quality Azure Speech Services** - Natural-sounding AI voice 
-- **Smart pause timing** - Pause before narration for better slide readability
-- **Automatic processing** - Handles slide export, audio generation, and video compilation
-- **Configurable settings** - Customize pause duration, narration source, and output settings
-- **Clean output** - Automatic cleanup of intermediate files
 
 ##  Quick Start
 
@@ -36,10 +27,13 @@ Automatically convert PowerPoint presentations into professional videos with hig
 1. **Set up Azure Speech Services:**
    - Create an Azure Cognitive Services Speech resource
    - Copy .env.example to .env and add your Azure credentials:
-   `
+
+   ```
    AZURE_SPEECH_KEY=your_speech_key_here
    AZURE_SPEECH_REGION=your_region_here
-   `
+   ```
+
+    - Edit the rest of the .env as needed.
 
 1. **Add narration to your PowerPoint:**
    - Open your PowerPoint file
@@ -48,7 +42,7 @@ Automatically convert PowerPoint presentations into professional videos with hig
 1. **Generate your video:**
    ```bash
    python generate_with_azure_audio.py
-   `
+   ```
 
 ## Project Structure
 
@@ -61,7 +55,7 @@ Automatically convert PowerPoint presentations into professional videos with hig
 
 Edit the .env file to customize:
 
-`env
+```env
 # PowerPoint file to process
 POWERPOINT_FILE=content_maintenance_process.pptx
 
@@ -73,7 +67,7 @@ PAUSE_DURATION=1.5
 
 # Output video filename
 OUTPUT_VIDEO=your_presentation_WITH_AZURE_AUDIO.mp4
-`
+```
 
 ##  How It Works
 

@@ -5,6 +5,13 @@ PowerPoint to Video Converter with Azure Speech Services
 This script automates the complete process of converting a PowerPoint presentation
 to a video with narration using Azure Speech Services.
 
+    print("📊 Files created:")
+    print("  • ppt_to_mp4WITH_AZURE_AUDIO.mp4 - Final video")
+    print("  • exported_slides/ - Individual slide images")
+    print("  • audio_clips/ - Generated audio files")
+    print("  • slide_images/ - Processed slide images")
+    print("  • test_audio/ - Audio test files")th narration using Azure Speech Services.
+
 Requirements:
 - PowerPoint presentation file: content_maintenance_process.pptx
 - Azure Speech Services credentials in .env file
@@ -21,6 +28,15 @@ import sys
 import subprocess
 import time
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Import utility functions
+from utilities.generate_from_slides import main as export_slides
+from utilities.generate_audio import test_audio_generation
+from utilities.generate_with_azure_audio import main as generate_video_with_audio
+
+# Load environment variables
+load_dotenv()
 
 def print_header(title):
     """Print a formatted header"""
@@ -36,14 +52,6 @@ def check_prerequisites():
     """Check if all required files and credentials exist"""
     print_step(0, "Checking prerequisites")
     
-    # Check for PowerPoint file
-    pptx_file = "content_maintenance_process.pptx"
-    if not os.path.exists(pptx_file):
-        print(f"❌ ERROR: PowerPoint file not found: {pptx_file}")
-        print("Please ensure your PowerPoint file is in the current directory.")
-        return False
-    print(f"✅ Found PowerPoint file: {pptx_file}")
-    
     # Check for .env file
     env_file = ".env"
     if not os.path.exists(env_file):
@@ -53,9 +61,17 @@ def check_prerequisites():
         print("ENDPOINT=https://your-region.api.cognitive.microsoft.com")
         return False
     print(f"✅ Found environment file: {env_file}")
+
+    # Check for PowerPoint file
+    pptx_file = os.environ.get('POWERPOINT_FILE', 'content_maintenance_process.pptx')
+    if not os.path.exists(pptx_file):
+        print(f"❌ ERROR: PowerPoint file not found: {pptx_file}")
+        print("Please ensure your PowerPoint file is in the current directory.")
+        return False
+    print(f"✅ Found PowerPoint file: {pptx_file}")
     
     # Check for required Python files
-    required_files = ["generate_from_slides.py", "generate_audio.py", "generate_with_azure_audio.py"]
+    required_files = ["utilities/generate_from_slides.py", "utilities/generate_audio.py", "utilities/generate_with_azure_audio.py"]
     for file in required_files:
         if not os.path.exists(file):
             print(f"❌ ERROR: Required Python file not found: {file}")
@@ -65,56 +81,18 @@ def check_prerequisites():
     print("✅ All prerequisites met!")
     return True
 
-def run_command(command, description):
-    """Run a command and handle errors"""
-    print(f"\n🚀 Running: {description}")
-    print(f"Command: {command}")
-    
-    try:
-        # Get the Python executable path
-        python_exe = sys.executable
-        if ".venv" in python_exe:
-            # We're in a virtual environment, use it
-            cmd = f'"{python_exe}" {command}'
-        else:
-            # Try to use the virtual environment if it exists
-            venv_python = Path("C:/git/movies/.venv/Scripts/python.exe")
-            if venv_python.exists():
-                cmd = f'"{venv_python}" {command}'
-            else:
-                cmd = f'python {command}'
-        
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        
-        if result.returncode == 0:
-            print("✅ Success!")
-            if result.stdout:
-                print("Output:")
-                print(result.stdout)
-            return True
-        else:
-            print("❌ Error occurred!")
-            if result.stderr:
-                print("Error details:")
-                print(result.stderr)
-            if result.stdout:
-                print("Output:")
-                print(result.stdout)
-            return False
-            
-    except Exception as e:
-        print(f"❌ Exception occurred: {e}")
-        return False
-
 def check_output_files():
     """Check if expected output files were created"""
     print_step(4, "Checking output files")
     
+    # Get filenames from environment variables
+    output_video = os.environ.get('OUTPUT_VIDEO_NAME', 'code_maintenance_process_WITH_AZURE_AUDIO.mp4')
+    
     expected_files = [
-        "code_maintenance_process_WITH_AZURE_AUDIO.mp4",
+        output_video,
         "exported_slides/",
-        "audio_clips/",
-        "slide_images/"
+        "audio_clips/"
+        # Note: slide_images/ is intentionally excluded as it's cleaned up after processing
     ]
     
     all_found = True
@@ -146,23 +124,38 @@ def main():
     
     # Step 1: Export slides from PowerPoint
     print_step(1, "Exporting slides from PowerPoint as images")
-    success = run_command("generate_from_slides.py", "Exporting PowerPoint slides to images")
-    if not success:
-        print("❌ Failed to export slides. Please check the error messages above.")
+    try:
+        success = export_slides()
+        if not success:
+            print("❌ Failed to export slides.")
+            return False
+        print("✅ Slides exported successfully!")
+    except Exception as e:
+        print(f"❌ Error exporting slides: {e}")
         return False
     
     # Step 2: Test Azure Speech Services
     print_step(2, "Testing Azure Speech Services")
-    success = run_command("generate_audio.py", "Testing Azure Speech Services connection")
-    if not success:
-        print("❌ Azure Speech Services test failed. Please check your credentials in .env file.")
+    try:
+        success = test_audio_generation()
+        if not success:
+            print("❌ Azure Speech Services test failed. Please check your credentials in .env file.")
+            return False
+        print("✅ Azure Speech Services test passed!")
+    except Exception as e:
+        print(f"❌ Error testing Azure Speech Services: {e}")
         return False
     
     # Step 3: Generate final video with audio
     print_step(3, "Generating final video with Azure Speech narration")
-    success = run_command("generate_with_azure_audio.py", "Creating final video with audio and pauses")
-    if not success:
-        print("❌ Failed to generate final video. Please check the error messages above.")
+    try:
+        success = generate_video_with_audio()
+        if not success:
+            print("❌ Failed to generate final video.")
+            return False
+        print("✅ Final video generated successfully!")
+    except Exception as e:
+        print(f"❌ Error generating final video: {e}")
         return False
     
     # Step 4: Verify outputs
@@ -173,17 +166,21 @@ def main():
     end_time = time.time()
     total_time = end_time - start_time
     
+    # Get output video name from environment
+    output_video = os.environ.get('OUTPUT_VIDEO_NAME', 'code_maintenance_process_WITH_AZURE_AUDIO.mp4')
+    
     print_header("Process Complete!")
     print(f"✅ Total processing time: {total_time:.1f} seconds ({total_time/60:.1f} minutes)")
-    print(f"🎬 Your video is ready: code_maintenance_process_WITH_AZURE_AUDIO.mp4")
+    print(f"🎬 Your video is ready: {output_video}")
     
     # Final summary
     print("\n📊 Files created:")
-    print("  • code_maintenance_process_WITH_AZURE_AUDIO.mp4 - Final video")
+    print(f"  • {output_video} - Final video")
     print("  • exported_slides/ - Individual slide images")
     print("  • audio_clips/ - Generated audio files")
-    print("  • slide_images/ - Processed slide images")
-    print("  • test_audio/ - Audio test files")
+    print("\n🧹 Cleaned up:")
+    print("  • slide_images/ - Temporary processed slide images")
+    print("  • test_audio/ - Temporary audio test files")
     
     print("\n🎉 Success! Your PowerPoint presentation has been converted to video with narration.")
     return True
