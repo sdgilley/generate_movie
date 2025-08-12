@@ -6,22 +6,41 @@ Automatically convert PowerPoint presentations into professional videos with hig
 
 ## 🚀 Quick Start
 
-### Option 1: GitHub Codespaces (Recommended)
+
+### Option 1: GitHub Codespaces
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/sdgilley/generate_movie)
 
-1. **Click the "Open in GitHub Codespaces" button above**
-2. **Wait for the environment to set up** (automatically installs dependencies)
-3. **Configure your Azure credentials** in the `.env` file:
+#### ⚠️ Important: Manual Slide Export Required in Codespaces
 
-   ```bash
+Due to Linux limitations, automatic slide export may only capture text. For full slide visuals, follow these steps:
+
+1. **Export your slides as PNG images from PowerPoint:**
+   - Open your presentation in PowerPoint (Windows or macOS)
+   - Go to `File > Export > Change File Type > PNG Portable Network Graphics Format`
+   - Click `Save As`, choose a folder (e.g., `exported_slides`)
+   - When prompted, select `All Slides`
+   - This will create individual PNG files for each slide
+1. **Export your slides as PNG images from PowerPoint:**
+. **Upload all PNG files to the `exported_slides/` folder in your Codespace**
+1. **Export your slides as PNG images from PowerPoint:**
+. **Upload your original PowerPoint file (`.pptx`) to the workspace**
+1. **Export your slides as PNG images from PowerPoint:**
+. **Configure your Azure credentials** in the `.env` file:
+
+   ```env
    SPEECH_KEY=your_azure_speech_key_here
    ENDPOINT=https://your-region.api.cognitive.microsoft.com
    POWERPOINT_FILE=your_presentation.pptx
    ```
 
-4. **Upload your PowerPoint file** to the codespace
-5. **Generate your video**: Use Ctrl+Shift+P → "Tasks: Run Task" → "Convert PowerPoint to Video"
+1. **Export your slides as PNG images from PowerPoint:**
+. **Upload your PowerPoint file** to the codespace
+1. **Export your slides as PNG images from PowerPoint:**
+1. **Generate your video**: Use Ctrl+Shift+P → "Tasks: Run Task" → "Convert PowerPoint to Video"
+1. Delete the files in `uploaded_slides/` when you're done so they won't be used for a new project in the codespace.
+
+**Note:** The code will automatically use the PNGs in `uploaded_slides/` if present and will not attempt to generate slides from text. If no PNGs are found, it will fall back to text-only images.
 
 ### Option 2: Local Development
 

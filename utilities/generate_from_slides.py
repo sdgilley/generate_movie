@@ -420,11 +420,12 @@ MANUAL EXPORT INSTRUCTIONS:
 
 def find_exported_slides():
     """Look for exported slide images in common locations"""
-    possible_dirs = ["exported_slides", "manual_slides", "slide_exports", "slides"]
+    possible_dirs = ["uploaded_slides", "exported_slides", "manual_slides", "slide_exports", "slides"]
     
     for dir_name in possible_dirs:
         if os.path.exists(dir_name):
-            png_files = [f for f in os.listdir(dir_name) if f.lower().endswith('.png')]
+            # Accept both slide_1.png and Slide1.png patterns
+            png_files = [f for f in os.listdir(dir_name) if f.lower().endswith('.png') and (f.lower().startswith('slide_') or f.lower().startswith('slide'))]
             if png_files:
                 # Sort numerically instead of alphabetically
                 import re
@@ -434,7 +435,6 @@ def find_exported_slides():
                     if numbers:
                         return int(numbers[0])  # Sort by first number found
                     return 0
-                
                 png_files.sort(key=natural_sort_key)
                 return dir_name, png_files
     
@@ -500,35 +500,45 @@ def main():
     # Try to export slides automatically
     print("\nAttempting to export slides as images...")
 
-    # Clean up old exported slides first to avoid conflicts
-    export_dir = "exported_slides"
-    if os.path.exists(export_dir):
-        old_files = [f for f in os.listdir(export_dir) if f.lower().endswith('.png')]
-        if old_files:
-            print(f"Cleaning up {len(old_files)} old slide images from {export_dir}/")
-            for f in old_files:
-                os.remove(os.path.join(export_dir, f))
+    # If uploaded_slides exists and contains PNGs, use those and skip export/cleanup
+    uploaded_dir = "uploaded_slides"
+    uploaded_pngs = [f for f in os.listdir(uploaded_dir) if f.lower().endswith('.png')] if os.path.exists(uploaded_dir) else []
+    if uploaded_pngs:
+        print(f"Found {len(uploaded_pngs)} PNG slides in {uploaded_dir}/. Using these and skipping export.")
+        slides_dir, slide_files = uploaded_dir, uploaded_pngs
+    else:
+        # Always clean up exported_slides before generating new ones
+        export_dir = "exported_slides"
+        if os.path.exists(export_dir):
+            old_files = [f for f in os.listdir(export_dir) if f.lower().endswith('.png')]
+            if old_files:
+                print(f"Cleaning up {len(old_files)} old slide images from {export_dir}/.")
+                for f in old_files:
+                    os.remove(os.path.join(export_dir, f))
 
-    success = False
+        success = False
 
-    # Try macOS Keynote method first (best visual fidelity on macOS)
-    print("Trying macOS Keynote export...")
-    success = export_slides_as_images_macos_keynote(pptx_file)
+        # Try macOS Keynote method first (best visual fidelity on macOS)
+        print("Trying macOS Keynote export...")
+        success = export_slides_as_images_macos_keynote(pptx_file)
 
-    # Try PowerShell method (best for Windows)
-    if not success:
-        print("Trying PowerShell export...")
-        success = export_slides_as_images_powershell(pptx_file)
+        # Try PowerShell method (best for Windows)
+        if not success:
+            print("Trying PowerShell export...")
+            success = export_slides_as_images_powershell(pptx_file)
 
-    # If PowerShell failed, try LibreOffice
-    if not success:
-        print("Trying LibreOffice export...")
-        success = export_slides_as_images_libreoffice(pptx_file)
+        # If PowerShell failed, try LibreOffice
+        if not success:
+            print("Trying LibreOffice export...")
+            success = export_slides_as_images_libreoffice(pptx_file)
 
-    # If both failed, try Python-based approach (macOS compatible)
-    if not success:
-        print("Trying Python-based export (macOS compatible)...")
-        success = export_slides_python_fallback(pptx_file)
+        # If both failed, try Python-based approach (macOS compatible)
+        if not success:
+            print("Trying Python-based export (macOS compatible)...")
+            success = export_slides_python_fallback(pptx_file)
+
+        # Look for existing exported slides
+        slides_dir, slide_files = find_exported_slides()
 
     # Look for existing exported slides
     slides_dir, slide_files = find_exported_slides()
