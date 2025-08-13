@@ -24,6 +24,7 @@ test_audio/
 
 # IDE
 .vscode/
+!.vscode/tasks.json
 .idea/
 
 # OS
