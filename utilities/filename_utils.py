@@ -40,7 +40,14 @@ def get_powerpoint_file():
 def get_output_video_name():
     """Generate output video name based on PowerPoint file"""
     pptx_file = get_powerpoint_file()
-    return generate_output_filename(pptx_file)
+    video_filename = generate_output_filename(pptx_file)
+    
+    # Create movies directory if it doesn't exist
+    movies_dir = "movies"
+    os.makedirs(movies_dir, exist_ok=True)
+    
+    # Return path with movies folder
+    return os.path.join(movies_dir, video_filename)
 
 if __name__ == "__main__":
     # Test the function

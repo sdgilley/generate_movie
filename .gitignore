@@ -12,10 +12,11 @@ env/
 .env
 
 # Generated Content
-*.mp4
+# *.mp4
 *.avi
 *.mov
 *.wmv
+movies/
 audio_clips/
 exported_slides/
 slide_images/

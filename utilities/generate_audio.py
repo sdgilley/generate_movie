@@ -20,7 +20,23 @@ def generate_audio_file(text, output_path, voice_name=None):
     try:
         # Get Azure Speech credentials
         speech_key = os.environ.get('SPEECH_KEY')
-        speech_region = "eastus2"  # Your region
+        
+        # Extract region from endpoint in .env file
+        endpoint = os.environ.get('ENDPOINT', '')
+        if "eastus2" in endpoint:
+            speech_region = "eastus2"
+        elif "eastus" in endpoint:
+            speech_region = "eastus"
+        elif "westus2" in endpoint:
+            speech_region = "westus2"
+        elif "westus" in endpoint:
+            speech_region = "westus"
+        else:
+            # Fallback to eastus2 for backward compatibility
+            speech_region = "eastus2"
+            print(f"Warning: Could not determine region from ENDPOINT={endpoint}, using default: {speech_region}")
+        
+        print(f"Using Azure Speech region: {speech_region}")
         
         # Get voice name from .env if not provided
         if voice_name is None:
