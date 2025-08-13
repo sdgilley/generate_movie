@@ -4,24 +4,32 @@ Automatically convert PowerPoint presentations into professional videos with hig
 
 ![Process Diagram](./media/diagram.png)
 
+## 🎬 Demo Video
+
+Here's an example of what the tool generates - a short test video created from a simple PowerPoint slide:
+
+**🎥 [View Demo Video](./media/test-ppt.mp4)** _(Click to download and play)_
+
+
 ## 🚀 Quick Start
 
 ### Get a speech endpoint and key
 
 This process uses Azure AI Foundry to produce narration for you.  To get the endpoint and key:
 
-1. Create or open a Foundry project. (No need to deploy a model, the new project type already has the speech capability built in.)  
+1. Create or open a Foundry project. (No need to deploy a model, the new project type already has the speech capability built in.)
 1. Go to **Overview > View all endpoints > Service endpoints > Azure AI Speech**.   You'll use the key and endpoint in your `.env` file in the instructions below.
 
 ![foundry settings](./media/foundry.png)
 
-### Prepare your Powerpoint 
+### Prepare your Powerpoint
 
-   - Open your PowerPoint file
-   - Add narration text to the **Notes** section of each slide
-   - Save the presentation
+- Open your PowerPoint file
+- Add narration text to the **Notes** section of each slide
+- Save the presentation
 
-### Option 1: GitHub Codespaces
+<details>
+<summary>### Option 1: GitHub Codespaces</summary>
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/sdgilley/generate_movie)
 
@@ -38,7 +46,7 @@ Due to Linux limitations, automatic slide export may only capture text. For full
 1. **Upload all PNG files to the `exported_slides/` folder in your Codespace**
 1. **Configure .env file**
 
-   - Copy .env.example to .env 
+   - Copy .env.example to .env
    - Add your values for the SPEECH_KEY, ENDPOINT, and POWERPOINT_FILE. (use the endpoint for tts)
 
 1. **Generate your video**: Use Ctrl+Shift+P → "Tasks: Run Task" → "Convert PowerPoint to Video"
@@ -46,7 +54,10 @@ Due to Linux limitations, automatic slide export may only capture text. For full
 
 **Note:** The code will automatically use the PNGs in `uploaded_slides/` if present and will not attempt to generate slides from text. If no PNGs are found, it will fall back to text-only images.
 
-### Option 2: Local Development
+</details>
+
+<details>
+<summary>### Option 2: Local Development</summary>
 
 1. **Create and activate a virtual environment:**
 
@@ -82,8 +93,8 @@ Due to Linux limitations, automatic slide export may only capture text. For full
 
 1. **Configure .env file**
 
-   - Copy .env.example to .env 
-   - Add your values for the SPEECH_KEY and POWERPOINT_FILE.
+   - Copy .env.example to .env
+   - Add your values for the SPEECH_KEY, ENDPOINT, and POWERPOINT_FILE. (use the endpoint for tts)
 
 
 1. **Generate your video:**
@@ -91,6 +102,8 @@ Due to Linux limitations, automatic slide export may only capture text. For full
    ```bash
    python generate_with_azure_audio.py
    ```
+
+</details>
 
 ## Project Structure
 
@@ -120,7 +133,7 @@ Due to Linux limitations, automatic slide export may only capture text. For full
 
 ## Troubleshooting
 
-- run `python test/test_voice.py` to make sure your `.env` settings work 
+- run `python test/test_voice.py` to make sure your `.env` settings work
 - run `python test/find_voice.py` to get a list of all the possible voices you could use
 
 ## Contributing
