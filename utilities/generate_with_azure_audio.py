@@ -70,7 +70,7 @@ def extract_narration_from_slides(presentation):
 
 def find_exported_slides():
     """Look for exported slide images in common locations"""
-    possible_dirs = ["exported_slides", "manual_slides", "slide_exports", "slides"]
+    possible_dirs = ["uploaded_slides", "exported_slides", "manual_slides", "slide_exports", "slides"]
     
     for dir_name in possible_dirs:
         if os.path.exists(dir_name):
