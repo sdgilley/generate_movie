@@ -47,14 +47,19 @@ def extract_narration_from_slides(presentation):
             except Exception as e:
                 print(f"Warning: Could not read notes for slide {i+1}: {e}")
             
-            # Store narration by title (for compatibility) and by slide number
-            if title and narration:
-                narration_dict[title] = narration
+            # Store narration by slide number (primary) and by title (secondary for compatibility)
+            if narration:
+                # Always store by slide number for guaranteed uniqueness
                 narration_dict[f"slide_{i+1}"] = narration
-                print(f"Slide {i+1} ('{title}'): {len(narration)} characters of narration")
-            elif narration:
-                narration_dict[f"slide_{i+1}"] = narration
-                print(f"Slide {i+1} (no title): {len(narration)} characters of narration")
+                
+                # Also store by title if available (but slide number takes precedence)
+                if title:
+                    # Only store by title if it doesn't already exist (avoids overwriting duplicates)
+                    if title not in narration_dict:
+                        narration_dict[title] = narration
+                    print(f"Slide {i+1} ('{title}'): {len(narration)} characters of narration")
+                else:
+                    print(f"Slide {i+1} (no title): {len(narration)} characters of narration")
             else:
                 print(f"Slide {i+1}: No narration found")
                 
@@ -160,19 +165,16 @@ def main():
                     title = slide.shapes.title.text.strip()
                 
                 # Try multiple ways to find narration:
-                # 1. By slide title (for compatibility with external files)
-                # 2. By slide number (slide_1, slide_2, etc.)
-                # 3. Direct lookup in case title is not available
-                if title:
+                # 1. By slide number (slide_1, slide_2, etc.) - PREFERRED for uniqueness
+                # 2. By slide title (for compatibility, but can have duplicates)
+                slide_key = f"slide_{i+1}"
+                narration = narration_notes.get(slide_key, "")
+                if narration:
+                    print(f"Found narration for slide {i+1} by number: {len(narration)} characters")
+                elif title:
                     narration = narration_notes.get(title, "")
                     if narration:
                         print(f"Found narration for '{title}' by title: {len(narration)} characters")
-                
-                if not narration:
-                    slide_key = f"slide_{i+1}"
-                    narration = narration_notes.get(slide_key, "")
-                    if narration:
-                        print(f"Found narration for slide {i+1} by number: {len(narration)} characters")
                 
                 if not narration:
                     print(f"No narration found for slide {i+1} (title: '{title}')")
