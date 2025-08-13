@@ -6,6 +6,14 @@ Automatically convert PowerPoint presentations into professional videos with hig
 
 ## 🚀 Quick Start
 
+### Get a speech key
+
+This process uses Azure AI Foundry to produce narration for you.  To get a key, create or open a Foundry projet.  Then go to **Overview > View all endpoints > Service endpoints > Azure AI Speech**.  Copy the key.  You'll use this in your `.env` file in the instructions below.
+
+### Prepare your Powerpoint 
+
+   - Open your PowerPoint file
+   - Add narration text to the **Notes** section of each slide
 
 ### Option 1: GitHub Codespaces
 
@@ -21,22 +29,12 @@ Due to Linux limitations, automatic slide export may only capture text. For full
    - Click `Save As`, choose a folder (e.g., `exported_slides`)
    - When prompted, select `All Slides`
    - This will create individual PNG files for each slide
-1. **Export your slides as PNG images from PowerPoint:**
-. **Upload all PNG files to the `exported_slides/` folder in your Codespace**
-1. **Export your slides as PNG images from PowerPoint:**
-. **Upload your original PowerPoint file (`.pptx`) to the workspace**
-1. **Export your slides as PNG images from PowerPoint:**
-. **Configure your Azure credentials** in the `.env` file:
+1. **Upload all PNG files to the `exported_slides/` folder in your Codespace**
+1. **Configure .env file**
 
-   ```env
-   SPEECH_KEY=your_azure_speech_key_here
-   ENDPOINT=https://your-region.api.cognitive.microsoft.com
-   POWERPOINT_FILE=your_presentation.pptx
-   ```
+   - Copy .env.example to .env 
+   - Add your values for the SPEECH_KEY and POWERPOINT_FILE.
 
-1. **Export your slides as PNG images from PowerPoint:**
-. **Upload your PowerPoint file** to the codespace
-1. **Export your slides as PNG images from PowerPoint:**
 1. **Generate your video**: Use Ctrl+Shift+P → "Tasks: Run Task" → "Convert PowerPoint to Video"
 1. Delete the files in `uploaded_slides/` when you're done so they won't be used for a new project in the codespace.
 
@@ -45,6 +43,7 @@ Due to Linux limitations, automatic slide export may only capture text. For full
 ### Option 2: Local Development
 
 1. **Create and activate a virtual environment:**
+
    ```bash
    # Create virtual environment
    python -m venv venv
@@ -75,20 +74,11 @@ Due to Linux limitations, automatic slide export may only capture text. For full
    brew install ghostscript
    ```
 
-1. **Set up Azure Speech Services:**
-   - Create an Azure Cognitive Services Speech resource
-   - Copy .env.example to .env and add your Azure credentials:
+1. **Configure .env file**
 
-   ```env
-   AZURE_SPEECH_KEY=your_speech_key_here
-   AZURE_SPEECH_REGION=your_region_here
-   ```
+   - Copy .env.example to .env 
+   - Add your values for the SPEECH_KEY and POWERPOINT_FILE.
 
-    - Edit the rest of the .env as needed.
-
-1. **Add narration to your PowerPoint:**
-   - Open your PowerPoint file
-   - Add narration text to the **Notes** section of each slide
 
 1. **Generate your video:**
 
@@ -103,22 +93,6 @@ Due to Linux limitations, automatic slide export may only capture text. For full
 - requirements.txt - Python dependencies
 - content_maintenance_process.pptx - Example PowerPoint file
 
-## Configuration
-
-Edit the .env file to customize:
-
-```env
-# PowerPoint file to process
-POWERPOINT_FILE=your_presentation.pptx
-
-# Note: Output video filename is automatically generated
-
-# Narration source: 'slide_notes' or 'external_file'
-NARRATION_SOURCE=slide_notes
-
-# Pause duration before narration (seconds)
-PAUSE_DURATION=1.5
-```
 
 ## How It Works
 
@@ -134,7 +108,7 @@ PAUSE_DURATION=1.5
 ## Requirements
 
 - Python 3.7+
-- Azure Cognitive Services Speech subscription
+- Azure AI Foundry project
 - PowerPoint (for slide export)
 - See requirements.txt for Python packages
 
