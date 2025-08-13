@@ -28,8 +28,9 @@ This process uses Azure AI Foundry to produce narration for you.  To get the end
 - Add narration text to the **Notes** section of each slide
 - Save the presentation
 
+### Option 1: GitHub Codespaces
 <details>
-<summary>### Option 1: GitHub Codespaces</summary>
+<summary>View instructions for GitHub Codespaces</summary>
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/sdgilley/generate_movie)
 
@@ -56,8 +57,10 @@ Due to Linux limitations, automatic slide export may only capture text. For full
 
 </details>
 
+### Option 2: Local Development
+
 <details>
-<summary>### Option 2: Local Development</summary>
+<summary>View instructions for local development</summary>
 
 1. **Create and activate a virtual environment:**
 
