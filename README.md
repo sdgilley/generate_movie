@@ -6,14 +6,20 @@ Automatically convert PowerPoint presentations into professional videos with hig
 
 ## 🚀 Quick Start
 
-### Get a speech key
+### Get a speech endpoint and key
 
-This process uses Azure AI Foundry to produce narration for you.  To get a key, create or open a Foundry projet.  Then go to **Overview > View all endpoints > Service endpoints > Azure AI Speech**.  Copy the key.  You'll use this in your `.env` file in the instructions below.
+This process uses Azure AI Foundry to produce narration for you.  To get the endpoint and key:
+
+1. Create or open a Foundry project. (No need to deploy a model, the new project type already has the speech capability built in.)  
+1. Go to **Overview > View all endpoints > Service endpoints > Azure AI Speech**.   You'll use the key and endpoint in your `.env` file in the instructions below.
+
+![foundry settings](./media/foundry.png)
 
 ### Prepare your Powerpoint 
 
    - Open your PowerPoint file
    - Add narration text to the **Notes** section of each slide
+   - Save the presentation
 
 ### Option 1: GitHub Codespaces
 
@@ -33,7 +39,7 @@ Due to Linux limitations, automatic slide export may only capture text. For full
 1. **Configure .env file**
 
    - Copy .env.example to .env 
-   - Add your values for the SPEECH_KEY and POWERPOINT_FILE.
+   - Add your values for the SPEECH_KEY, ENDPOINT, and POWERPOINT_FILE. (use the endpoint for tts)
 
 1. **Generate your video**: Use Ctrl+Shift+P → "Tasks: Run Task" → "Convert PowerPoint to Video"
 1. Delete the files in `uploaded_slides/` when you're done so they won't be used for a new project in the codespace.
@@ -111,6 +117,11 @@ Due to Linux limitations, automatic slide export may only capture text. For full
 - Azure AI Foundry project
 - PowerPoint (for slide export)
 - See requirements.txt for Python packages
+
+## Troubleshooting
+
+- run `python test/test_voice.py` to make sure your `.env` settings work 
+- run `python test/find_voice.py` to get a list of all the possible voices you could use
 
 ## Contributing
 
