@@ -4,13 +4,16 @@ Automatically convert PowerPoint presentations into professional videos with hig
 
 ![Process Diagram](./media/diagram.png)
 
-## 🎬 Demo Video
+<details>
+<summary>🎬 Demo Video</summary>
 
 Here's an example of what the tool generates - a short test video created from a simple PowerPoint slide:
 
 https://github.com/user-attachments/assets/af3002bc-d814-47d7-bd7d-f0557fefc782
 
 > You can create this video yourself with the default .env values
+
+</details>
 
 ## 🚀 Quick Start
 
