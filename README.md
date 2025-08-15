@@ -8,10 +8,7 @@ Automatically convert PowerPoint presentations into professional videos with hig
 
 Here's an example of what the tool generates - a short test video created from a simple PowerPoint slide:
 
-<video width="600" controls>
-  <source src="https://github.com/user-attachments/assets/af3002bc-d814-47d7-bd7d-f0557fefc782" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+https://github.com/user-attachments/assets/af3002bc-d814-47d7-bd7d-f0557fefc782
 
 > You can create this video yourself with the default .env values
 
