@@ -8,19 +8,24 @@ load_dotenv()
 def generate_audio_file(text, output_path, voice_name=None):
     """
     Generate audio file from text using Azure Speech Services
-    
+
+    Supports either:
+    - token-based auth via environment variable `AZURE_ACCESS_TOKEN` (preferred for Entra/MSAL flow), or
+    - subscription-key auth via `SPEECH_KEY` (backward compatibility).
+
     Args:
         text (str): Text to convert to speech
         output_path (str): Path where to save the audio file (should end with .wav)
         voice_name (str): Voice to use for synthesis (if None, uses .env setting)
-    
+
     Returns:
         bool: True if successful, False otherwise
     """
     try:
-        # Get Azure Speech credentials
+        # Get Azure credentials
         speech_key = os.environ.get('SPEECH_KEY')
-        
+        access_token = os.environ.get('AZURE_ACCESS_TOKEN')
+
         # Extract region from endpoint in .env file
         endpoint = os.environ.get('ENDPOINT', '')
         if "eastus2" in endpoint:
@@ -35,32 +40,47 @@ def generate_audio_file(text, output_path, voice_name=None):
             # Fallback to eastus2 for backward compatibility
             speech_region = "eastus2"
             print(f"Warning: Could not determine region from ENDPOINT={endpoint}, using default: {speech_region}")
-        
+
         print(f"Using Azure Speech region: {speech_region}")
-        
+
         # Get voice name from .env if not provided
         if voice_name is None:
             voice_name = os.environ.get('VOICE_NAME', 'en-US-AvaMultilingualNeural')
-        
-        if not speech_key:
-            print("Error: SPEECH_KEY not found in environment variables")
+
+        # Prefer token-based auth if an access token is present (MSAL flow)
+        speech_config = None
+        if access_token:
+            print("Using AZURE_ACCESS_TOKEN (token-based auth) for speech synthesis")
+            # Create SpeechConfig with region and set authorization token
+            speech_config = speechsdk.SpeechConfig(region=speech_region)
+            # Use the SDK property to set the authorization token
+            try:
+                speech_config.authorization_token = access_token
+            except Exception:
+                # Some SDK builds expose slightly different APIs; try the alternate name
+                try:
+                    speech_config._properties.set_property("1003", access_token)
+                except Exception:
+                    pass
+        elif speech_key:
+            print("Using SPEECH_KEY (subscription key) for speech synthesis")
+            speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=speech_region)
+        else:
+            print("Error: neither AZURE_ACCESS_TOKEN nor SPEECH_KEY found in environment variables")
             return False
-        
-        # Create speech config
-        speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=speech_region)
+
+        # Configure voice and audio output
         speech_config.speech_synthesis_voice_name = voice_name
-        
-        # Configure audio output to file
         audio_config = speechsdk.audio.AudioOutputConfig(filename=output_path)
-        
+
         # Create synthesizer
         speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
-        
+
         print(f"Generating audio for: {text[:50]}...")
-        
+
         # Synthesize speech
         speech_synthesis_result = speech_synthesizer.speak_text_async(text).get()
-        
+
         if speech_synthesis_result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
             print(f"Audio saved successfully: {output_path}")
             return True
@@ -74,7 +94,7 @@ def generate_audio_file(text, output_path, voice_name=None):
         else:
             print(f"Unexpected result: {speech_synthesis_result.reason}")
             return False
-            
+
     except Exception as e:
         print(f"Error generating audio: {e}")
         return False
