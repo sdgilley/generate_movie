@@ -20,6 +20,11 @@ def export_slides_as_images_libreoffice(pptx_file, output_dir="exported_slides")
     """Try to export slides using LibreOffice + ImageMagick with better visual fidelity"""
     os.makedirs(output_dir, exist_ok=True)
     
+    # Debug info
+    print(f"Debug: Absolute path check: {os.path.abspath(pptx_file)}")
+    print(f"Debug: File exists check: {os.path.exists(pptx_file)}")
+    print(f"Debug: Is file check: {os.path.isfile(pptx_file)}")
+    
     try:
         # First, try to convert PowerPoint to PDF using LibreOffice with better settings
         print("Converting PowerPoint to PDF using LibreOffice (with enhanced settings)...")
@@ -114,7 +119,7 @@ def export_slides_as_images_macos_keynote(pptx_file, output_dir="exported_slides
         end tell
         '''
         
-        print("Trying to export slides using macOS Keynote...")
+        # print("Trying to export slides using macOS Keynote...")
         result = subprocess.run(
             ["osascript", "-e", applescript],
             capture_output=True, text=True, timeout=120
@@ -224,7 +229,7 @@ def export_slides_as_images_powershell(pptx_file, output_dir="exported_slides"):
 
 def export_slides_python_fallback(pptx_file, output_dir="exported_slides"):
     """Export slides using pure Python approach (macOS compatible)"""
-    print("Trying Python-based slide export (macOS compatible)...")
+    # print("Trying Python-based slide export (macOS compatible)...")
     
     try:
         from PIL import Image, ImageDraw, ImageFont
@@ -362,9 +367,31 @@ def export_slides_python_fallback(pptx_file, output_dir="exported_slides"):
             
             return img
 
-        # Load presentation
-        presentation = Presentation(pptx_file)
-        print(f"Loaded presentation with {len(presentation.slides)} slides for Python export")
+        # Load presentation with additional error checking
+        try:
+            # Try to open file first to verify it exists and is accessible
+            with open(pptx_file, 'rb') as f:
+                # Now try to load as PowerPoint
+                presentation = Presentation(pptx_file)
+                print(f"Loaded presentation with {len(presentation.slides)} slides for Python export")
+        except FileNotFoundError:
+            print(f"Error: File not found: {pptx_file}")
+            return False
+        except PermissionError:
+            print(f"Error: Permission denied accessing file: {pptx_file}")
+            return False
+        except Exception as e:
+            print(f"Error loading PowerPoint file: {str(e)}")
+            print("Trying alternative loading method...")
+            try:
+                # Try with normalized path
+                norm_path = os.path.normpath(pptx_file).replace("\\", "/")
+                presentation = Presentation(norm_path)
+                print(f"Successfully loaded presentation using normalized path")
+            except Exception as e2:
+                print(f"Both loading attempts failed. Original error: {str(e)}")
+                print(f"Second attempt error: {str(e2)}")
+                return False
         
         # Create output directory
         os.makedirs(output_dir, exist_ok=True)
@@ -483,10 +510,32 @@ def extract_narration_from_slides(presentation):
 # Load the PowerPoint presentation to get slide count and titles
 def main():
     """Main function to export slides from PowerPoint"""
-    pptx_file = os.environ.get('POWERPOINT_FILE', 'content_maintenance_process.pptx')
+    pptx_file = get_powerpoint_file()  # Get file from .env
+    if not os.path.exists(pptx_file):
+        print(f"❌ Error: PowerPoint file not found: {pptx_file}")
+        print("Please check that the POWERPOINT_FILE path in .env is correct and the file exists.")
+        return False
+        
     print(f"Loading PowerPoint presentation: {pptx_file}")
-    presentation = Presentation(pptx_file)
-    print(f"Loaded presentation with {len(presentation.slides)} slides")
+    # Add debug info about the file
+    print(f"File size: {os.path.getsize(pptx_file)} bytes")
+    print(f"Last modified: {os.path.getmtime(pptx_file)}")
+    
+    try:
+        presentation = Presentation(pptx_file)
+        print(f"Loaded presentation with {len(presentation.slides)} slides")
+    except Exception as e:
+        print(f"❌ Error loading PowerPoint file: {e}")
+        print("\nThis error often occurs when the PowerPoint file has restricted permissions.")
+        print("\nPlease try the following:")
+        print("1. Open the presentation in PowerPoint")
+        print("2. Click the Sensitivity button in the top bar (if present)")
+        print("3. Change the sensitivity label to 'General' or remove any confidential/sensitive labels")
+        print("4. Save the file and try running this script again")
+        print("\nIf that doesn't work, also check:")
+        print("• File -> Info -> Protect Document -> Check for any restrictions")
+        print("• File -> Save As -> Tools -> Save Options -> Check for any special format settings")
+        return False
 
     # Extract narration from PowerPoint slide notes
     print(f"\nExtracting narration from PowerPoint slide notes...")
@@ -519,22 +568,23 @@ def main():
         success = False
 
         # Try macOS Keynote method first (best visual fidelity on macOS)
-        print("Trying macOS Keynote export...")
-        success = export_slides_as_images_macos_keynote(pptx_file)
-
-        # Try PowerShell method (best for Windows)
-        if not success:
-            print("Trying PowerShell export...")
+        # print("Trying macOS Keynote export...")
+        # On Windows, try PowerShell first (most reliable with Office)
+        if os.name == 'nt':
+            print("Trying PowerShell export method (recommended for Windows)...")
             success = export_slides_as_images_powershell(pptx_file)
+        else:
+            # On macOS, try Keynote first
+            success = export_slides_as_images_macos_keynote(pptx_file)
 
-        # If PowerShell failed, try LibreOffice
+        # If that failed, try LibreOffice
         if not success:
-            print("Trying LibreOffice export...")
+            print("Trying LibreOffice export method...")
             success = export_slides_as_images_libreoffice(pptx_file)
 
         # If both failed, try Python-based approach (macOS compatible)
         if not success:
-            print("Trying Python-based export (macOS compatible)...")
+            # print("Trying Python-based export (macOS compatible)...")
             success = export_slides_python_fallback(pptx_file)
 
         # Look for existing exported slides

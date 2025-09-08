@@ -30,14 +30,14 @@ import time
 from pathlib import Path
 from dotenv import load_dotenv
 
+# Load environment variables first
+load_dotenv()
+
 # Import utility functions
 from utilities.generate_from_slides import main as export_slides
 from utilities.generate_audio import test_audio_generation
 from utilities.generate_with_azure_audio import main as generate_video_with_audio
 from utilities.filename_utils import get_powerpoint_file, get_output_video_name
-
-# Load environment variables
-load_dotenv()
 
 def print_header(title):
     """Print a formatted header"""
@@ -198,6 +198,7 @@ def main():
         print(f"  • {intermediate_name} - Intermediate slides-only video")
     
     print("\n🎉 Success! Your PowerPoint presentation has been converted to video with narration.")
+    print(f"See {output_video} to view the result.")
     return True
 
 if __name__ == "__main__":

@@ -5,6 +5,10 @@ Utility functions for filename handling
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 def generate_output_filename(pptx_file, suffix=""):
     """
@@ -34,8 +38,20 @@ def generate_output_filename(pptx_file, suffix=""):
     return output_filename
 
 def get_powerpoint_file():
-    """Get the PowerPoint file from environment or default"""
-    return os.environ.get('POWERPOINT_FILE', 'content_maintenance_process.pptx')
+    """Get the PowerPoint file from environment variable and convert to absolute path
+    
+    Raises:
+        ValueError: If POWERPOINT_FILE is not set in .env
+    """
+    pptx_file = os.environ.get('POWERPOINT_FILE')
+    if not pptx_file:
+        raise ValueError("POWERPOINT_FILE must be set in .env file")
+    
+    # Convert to absolute path if it's not already
+    if not os.path.isabs(pptx_file):
+        pptx_file = os.path.abspath(pptx_file)
+    
+    return pptx_file
 
 def get_output_video_name():
     """Generate output video name based on PowerPoint file"""
