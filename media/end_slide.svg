@@ -70,7 +70,7 @@
   
   <!-- GitHub URL -->
   <text class="text subtitle" x="480" y="510">For more information and source code, visit:</text>
-  <text class="text url" x="480" y="550">https://github.com/sdgilley/generate_movie</text>
+  <text class="text url" x="480" y="550">https://github.com/sdgilley/ppt-to-mp4</text>
   
   <!-- Footer -->
   <text class="text" style="font-size: 14px; fill: #64748b;" x="480" y="610">Open source PowerPoint to Video converter</text>

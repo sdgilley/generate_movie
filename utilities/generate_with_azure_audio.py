@@ -239,7 +239,7 @@ def main():
                     print(f"Using end slide image: {end_slide_path}")
                     
                     # Generate narration for the end slide
-                    end_slide_narration = "This video was generated from a PowerPoint presentation using Azure AI. For more information and source code, visit github.com/sdgilley/generate_movie"
+                    end_slide_narration = "This video was generated from a PowerPoint presentation using Azure AI. For more information and source code, visit github.com/sdgilley/ppt-to-mp4"
                     end_slide_audio_path = "audio_clips/audio_end_slide.wav"
                     
                     print("Generating audio for end slide...")
