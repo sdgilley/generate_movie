@@ -32,36 +32,9 @@ This process uses Azure AI Foundry to produce narration for you.  To get the end
 - Add narration text to the **Notes** section of each slide
 - Save the presentation
 
-### Option 1: GitHub Codespaces
-<details>
-<summary>View instructions for GitHub Codespaces</summary>
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/sdgilley/generate_movie)
 
-#### ⚠️ Important: Manual Slide Export Required in Codespaces
-
-Due to Linux limitations, automatic slide export may only capture text. For full slide visuals, follow these steps:
-
-1. **Export your slides as PNG images from PowerPoint:**
-   - Open your presentation in PowerPoint (Windows or macOS)
-   - Go to `File > Export > Change File Type > PNG Portable Network Graphics Format`
-   - Click `Save As`, choose a folder (e.g., `exported_slides`)
-   - When prompted, select `All Slides`
-   - This will create individual PNG files for each slide
-1. **Upload all PNG files to the `exported_slides/` folder in your Codespace**
-1. **Configure .env file**
-
-   - Copy .env.example to .env
-   - Add your values for the SPEECH_KEY, ENDPOINT, and POWERPOINT_FILE. (use the endpoint for tts)
-
-1. **Generate your video**: Use Ctrl+Shift+P → "Tasks: Run Task" → "Convert PowerPoint to Video"
-1. Delete the files in `uploaded_slides/` when you're done so they won't be used for a new project in the codespace.
-
-**Note:** The code will automatically use the PNGs in `uploaded_slides/` if present and will not attempt to generate slides from text. If no PNGs are found, it will fall back to text-only images.
-
-</details>
-
-### Option 2: Local Development
+### Option 1: Local Development
 
 <details>
 <summary>View instructions for local development</summary>
@@ -112,12 +85,40 @@ Due to Linux limitations, automatic slide export may only capture text. For full
 
 </details>
 
+### Option 2: GitHub Codespaces
+<details>
+<summary>View instructions for GitHub Codespaces</summary>
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/sdgilley/generate_movie)
+
+#### ⚠️ Important: Manual Slide Export Required in Codespaces
+
+Due to Linux limitations, automatic slide export may only capture text. For full slide visuals, follow these steps:
+
+1. **Export your slides as PNG images from PowerPoint:**
+   - Open your presentation in PowerPoint (Windows or macOS)
+   - Go to `File > Export > Change File Type > PNG Portable Network Graphics Format`
+   - Click `Save As`, choose a folder (e.g., `exported_slides`)
+   - When prompted, select `All Slides`
+   - This will create individual PNG files for each slide
+1. **Upload all PNG files to the `exported_slides/` folder in your Codespace**
+1. **Configure .env file**
+
+   - Copy .env.example to .env
+   - Add your values for the SPEECH_KEY, ENDPOINT, and POWERPOINT_FILE. (use the endpoint for tts)
+
+1. **Generate your video**: Use Ctrl+Shift+P → "Tasks: Run Task" → "Convert PowerPoint to Video"
+1. Delete the files in `uploaded_slides/` when you're done so they won't be used for a new project in the codespace.
+
+**Note:** The code will automatically use the PNGs in `uploaded_slides/` if present and will not attempt to generate slides from text. If no PNGs are found, it will fall back to text-only images.
+
+</details>
+
 ## Project Structure
 
-- generate_with_azure_audio.py - Main script for video generation
-- generate_from_slides.py - Export slides from PowerPoint
+- create-mp4 - Main script for video generation
 - requirements.txt - Python dependencies
-- content_maintenance_process.pptx - Example PowerPoint file
+- test-ppt.pptx - Example PowerPoint file
 
 
 ## How It Works
